@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: expense-tracker-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./expenses.db:/app/expenses.db
+      - ./app:/app/app
+    environment:
+      - APP_NAME=Expense Tracker API
+      - DEBUG=False
+      - DATABASE_URL=sqlite:///./expenses.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - expense-network
+
+networks:
+  expense-network:
+    driver: bridge
+
+volumes:
+  db-data:
